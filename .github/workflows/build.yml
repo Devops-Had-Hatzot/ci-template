@@ -21,9 +21,12 @@ jobs:
 
       - id: folders
         run: |
+          echo $github.event.before
+          echo $github.sha
+          git diff --name-only
           folders=$(git diff --name-only \
             "${{ github.event.before }}" \
-            "${{ github.sha }}" |
+            "${{  }}" |
             cut -d/ -f1 |
             sort -u |
             jq -R -s -c 'split("\n") | map(select(length > 0))')
