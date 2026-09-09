@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: GCP authentication
-        uses: Devops-Had-Hatzot/ci-template/.github/actions/auth
+        uses: Devops-Had-Hatzot/ci-template/.github/actions/auth@main
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
           registry: ${{ env.REGION }}-docker.pkg.dev
