@@ -1,0 +1,20 @@
+# .github/workflows/main.yml
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+  workflow_call:
+
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    uses: Amit11234/until-midnight-infra/.github/workflows/build.yml@main
+
+  mirror:
+    if: startsWith(github.ref, 'refs/tags/')
+    uses: Amit11234/until-midnight-infra/.github/workflows/build.yml@main

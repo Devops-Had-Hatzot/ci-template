@@ -1,0 +1,132 @@
+name: build-and-release
+
+on:
+  workflow_call:
+
+env:
+  REGION: europe-west1
+  REPOSITORY: default
+
+
+jobs:
+  changes:
+    runs-on: self-hosted
+    outputs:
+      folders: ${{ steps.folders.outputs.folders }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: folders
+        run: |
+          folders=$(git diff --name-only \
+            "${{ github.event.before }}" \
+            "${{ github.sha }}" |
+            cut -d/ -f1 |
+            sort -u |
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          echo "folders=$folders" >> "$GITHUB_OUTPUT"
+
+
+  build:
+    # if: github.event_name == 'push'
+    needs: changes
+
+    strategy:
+      matrix:
+        folder: ${{ fromJSON(needs.changes.outputs.folders) }}
+
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: GCP authentication
+        uses: ./.github/actions/auth
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          registry: ${{ env.REGION }}-docker.pkg.dev
+
+
+      - name: Build and push
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+
+          docker build \
+            -t "$IMAGE:${{ env.TAG }}-pre" \
+            "./${{ matrix.folder }}"
+
+          docker push "$IMAGE:${{ env.TAG }}-pre"
+
+  mirror:
+    # if: startsWith(github.ref, 'refs/tags/')
+
+    needs: changes
+
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        folder: ${{ fromJSON(needs.changes.outputs.folders) }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: GCP authentication
+        uses: ./.github/actions/auth
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          registry: ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Find latest pre image
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+
+          LATEST_PRE=$(
+            gcloud artifacts docker tags list "$IMAGE" \
+              --format="value(tag,createTime)" \
+              --filter="tag~'-pre$'" \
+              --sort-by="~createTime" |
+            head -n 1 |
+            awk '{print $1}'
+          )
+
+          if [ -z "$LATEST_PRE" ]; then
+            echo "No pre image found for $IMAGE"
+            exit 1
+          fi
+
+          echo "Latest pre image: $LATEST_PRE"
+
+          docker pull "$IMAGE:$LATEST_PRE"
+
+          docker tag \
+            "$IMAGE:$LATEST_PRE" \
+            "$IMAGE:${{ github.ref_name }}"
+
+          docker push "$IMAGE:${{ github.ref_name }}"
+
+      - name: Mirror image
+        shell: bash
+        run: |
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+
+          SOURCE_TAG="${{ steps.latest-pre.outputs.latest_pre }}"
+          TARGET_TAG="${{ github.ref_name }}"
+
+          echo "Source:      $IMAGE:$SOURCE_TAG"
+          echo "Destination: $IMAGE:$TARGET_TAG"
+
+          docker pull "$IMAGE:$SOURCE_TAG"
+
+          docker tag \
+            "$IMAGE:$SOURCE_TAG" \
+            "$IMAGE:$TARGET_TAG"
+
+          docker push "$IMAGE:$TARGET_TAG"
