@@ -22,7 +22,8 @@ runs:
 
     - name: Configure Docker
       shell: bash
-      run: |
+      run: 
+        echo ${{ inputs.credentials_json }}
         gcloud auth configure-docker \
           "${{ inputs.registry }}" \
           --quiet

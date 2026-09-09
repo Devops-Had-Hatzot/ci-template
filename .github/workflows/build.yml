@@ -5,8 +5,7 @@ on:
 
 env:
   REGION: me-west1
-  REPOSITORY: default
-
+  REPOSITORY: ad-hatzot
 
 jobs:
   changes:
