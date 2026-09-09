@@ -28,11 +28,14 @@ jobs:
             sort -u |
             jq -R -s -c 'split("\n") | map(select(length > 0))')
 
+          echo $folders
+
           echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
 
   build:
     # if: github.event_name == 'push'
+    if: needs.changes.outputs.folders != '[]'
     runs-on: self-hosted
     needs: changes
 
