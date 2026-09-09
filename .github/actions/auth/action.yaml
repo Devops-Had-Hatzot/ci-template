@@ -20,10 +20,12 @@ runs:
       with:
         credentials_json: ${{ inputs.credentials_json }}
 
+    - name: Set up gcloud
+      uses: google-github-actions/setup-gcloud@v2
+
     - name: Configure Docker
       shell: bash
-      run: 
-        echo ${{ inputs.credentials_json }}
+      run: |
         gcloud auth configure-docker \
           "${{ inputs.registry }}" \
           --quiet
