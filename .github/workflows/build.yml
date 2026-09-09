@@ -51,7 +51,6 @@ jobs:
 
       - name: GCP authentication
         uses: Devops-Had-Hatzot/ci-template/.github/actions/auth@main
-        secrets: inherit
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
           registry: ${{ env.REGION }}-docker.pkg.dev
