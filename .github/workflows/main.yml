@@ -14,9 +14,16 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
-    secrets: inherit
+    secrets:
+       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+    run:
+      echo ${{ secrets.GCP_CREDENTIALS }}
 
   mirror:
     if: startsWith(github.ref, 'refs/tags/')
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
     secrets: inherit
+    secrets:
+       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+    run:
+      echo ${{ secrets.GCP_CREDENTIALS }}
