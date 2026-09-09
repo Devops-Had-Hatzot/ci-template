@@ -50,6 +50,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: secrets
+        run: |
+          echo ${{ secrets.GCP_CREDENTIALS }}"
 
       - name: GCP authentication
         uses: Devops-Had-Hatzot/ci-template/.github/actions/auth@main
