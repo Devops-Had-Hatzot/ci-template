@@ -12,9 +12,11 @@ on:
 
 jobs:
   build:
+    runs-on: self-hosted
     if: github.ref == 'refs/heads/main'
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
 
   mirror:
+    runs-on: self-hosted
     if: startsWith(github.ref, 'refs/tags/')
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
