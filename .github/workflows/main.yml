@@ -14,7 +14,9 @@ jobs:
   build:
     if: github.ref == 'refs/heads/main'
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
+    secrets: inherit
 
   mirror:
     if: startsWith(github.ref, 'refs/tags/')
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
+    secrets: inherit
