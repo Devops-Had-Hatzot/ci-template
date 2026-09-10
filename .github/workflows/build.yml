@@ -144,7 +144,7 @@ jobs:
       - name: Mirror image
         shell: bash
         run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
 
           SOURCE_TAG="${{ steps.latest-pre.outputs.latest_pre }}"
           TARGET_TAG="${{ github.ref_name }}"
