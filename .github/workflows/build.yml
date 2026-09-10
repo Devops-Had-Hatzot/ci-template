@@ -41,6 +41,26 @@ jobs:
 
           echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
+  folders:
+    runs-on: self-hosted
+    outputs:
+      folders: ${{ steps.folders.outputs.folders }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - id: folders
+        run: |
+          folders=$(find . -mindepth 2 -maxdepth 2 -type f -name Dockerfile \
+            -printf '%h\n' |
+            sed 's|^\./||' |
+            sort -u |
+            jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+          echo "$folders"
+          echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
   build:
     # if: github.event_name == 'push'
@@ -74,7 +94,7 @@ jobs:
   mirror:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: self-hosted
-    needs: changes
+    needs: folders
 
     strategy:
       matrix:
