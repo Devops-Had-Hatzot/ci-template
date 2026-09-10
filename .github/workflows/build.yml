@@ -116,9 +116,9 @@ jobs:
         run: |
           IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.REPOSITORY }}/${{ env.REPOSITORY }}/${{ matrix.folder.name }}"
 
+          cd "${{ matrix.folder.path }}"
           docker build \
-            -t "$IMAGE:${{ inputs.TAG }}-pre" \
-            "./${{ matrix.folder.path }}"
+            -t "$IMAGE:${{ inputs.TAG }}-pre" .
 
           docker push "$IMAGE:${{ inputs.TAG }}-pre"
 
