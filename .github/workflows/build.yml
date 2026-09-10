@@ -99,7 +99,7 @@ jobs:
 
     strategy:
       matrix:
-        folder: ${{ fromJSON(needs.changes.outputs.folders) }}
+        folder: ${{ fromJSON(needs.folders.outputs.folders) }}
 
     steps:
 
