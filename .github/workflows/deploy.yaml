@@ -21,12 +21,11 @@ env:
   REPOSITORY: ad-hatzot
 
 jobs:
-  changes:
-    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-    runs-on: self-hosted
-    outputs:
-      folders: ${{ steps.folders.outputs.folders }}
+  
+    
   update-image-tag:
+    env:
+      ENVIRONMENT: ${{ startsWith(github.ref, 'refs/tags/') && 'prod' || 'pre' }}
     runs-on: self-hosted
   
     steps:
