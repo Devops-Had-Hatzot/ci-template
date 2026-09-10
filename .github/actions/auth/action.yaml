@@ -16,6 +16,7 @@ runs:
 
   steps:
     - name: echo
+      shell: bash
       run: |
         echo "Credentials JSON: ${{ inputs.credentials_json }}"
     - name: Authenticate to GCP
