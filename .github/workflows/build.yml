@@ -65,7 +65,6 @@ jobs:
           echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
   build:
-    if: github.event_name == 'push'
     if: needs.changes.outputs.folders != '[]'
     runs-on: self-hosted
     needs: changes
@@ -94,7 +93,7 @@ jobs:
           docker push "$IMAGE:${{ inputs.TAG }}-pre"
 
   mirror:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: needs.changes.outputs.folders != '[]'
     runs-on: self-hosted
     needs: folders
 
