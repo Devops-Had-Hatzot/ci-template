@@ -1,6 +1,6 @@
 # .github/workflows/main.yml
 
-name: CI
+name: CICD
 
 on:
   push:
@@ -11,6 +11,12 @@ on:
   workflow_call:
     inputs:
       TAG:
+        required: true
+        type: string
+      ENVIRONMENT:
+        required: true
+        type: string
+      MADOR:
         required: true
         type: string
 
@@ -26,6 +32,14 @@ jobs:
   mirror:
     if: startsWith(github.ref, 'refs/tags/')
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
+    with:
+      TAG: ${{ inputs.TAG }}
+    secrets:
+       GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+
+  deploy:
+    if: startsWith(github.ref, 'refs/tags/')
+    uses: Devops-Had-Hatzot/ci-template/.github/workflows/deploy.yml@main
     with:
       TAG: ${{ inputs.TAG }}
     secrets:
