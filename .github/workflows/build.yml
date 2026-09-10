@@ -50,16 +50,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: secrets
-        run: |
-          echo "${{ secrets.GCP_CREDENTIALS }}"
 
       - name: GCP authentication
         uses: Devops-Had-Hatzot/ci-template/.github/actions/auth@main
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
           registry: ${{ env.REGION }}-docker.pkg.dev
-
 
       - name: Build and push
         run: |
