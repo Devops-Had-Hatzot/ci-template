@@ -39,7 +39,8 @@ jobs:
           # Non-monorepo:
           # If there is a Dockerfile in the root, build the root context.
           if [ -f "./Dockerfile" ]; then
-            folders='["."]'
+            folders=$(printf '%s\n' "${{ github.event.repository.name }}" |
+              jq -R -s -c 'split("\n") | map(select(length > 0))')
           else
             # Monorepo:
             # Find top-level folders affected by the changes
