@@ -9,9 +9,6 @@ on:
       TAG:
         required: true
         type: string
-      ENVIRONMENT:
-        required: true
-        type: string
       MADOR:
         required: true
         type: string
