@@ -12,6 +12,9 @@ on:
       MADOR:
         required: true
         type: string
+      ENVIRONMENT:
+        required: true
+        type: string
 
 env:
   REGION: me-west1
