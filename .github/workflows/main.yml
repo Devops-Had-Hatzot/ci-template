@@ -39,7 +39,16 @@ jobs:
        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
   deploy:
-    needs: mirror
+    needs: [build, mirror]
+    if: |
+      always() &&
+      (
+        needs.mirror.result == 'success' ||
+        (
+          needs.mirror.result == 'skipped' &&
+          needs.build.result == 'success'
+        )
+      )
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/deploy.yml@main
     with:
       TAG: ${{ inputs.TAG }}
