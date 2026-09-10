@@ -112,11 +112,11 @@ jobs:
 
       - name: Build and push
         run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.REPOSITORY }}/${{ env.REPOSITORY }}//${{ matrix.name }}"
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.REPOSITORY }}/${{ env.REPOSITORY }}//${{ matrix.folder.name }}"
 
           docker build \
             -t "$IMAGE:${{ inputs.TAG }}-pre" \
-            "./${{ matrix.path }}""
+            "./${{ matrix.folder.path }}"
 
           docker push "$IMAGE:${{ inputs.TAG }}-pre"
 
