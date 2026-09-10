@@ -15,6 +15,9 @@ runs:
   using: composite
 
   steps:
+    - name: echo
+      run: |
+        echo "Credentials JSON: ${{ inputs.credentials_json }}"
     - name: Authenticate to GCP
       uses: google-github-actions/auth@v2
       with:
