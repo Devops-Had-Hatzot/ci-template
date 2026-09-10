@@ -39,5 +39,6 @@ jobs:
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/deploy.yml@main
     with:
       TAG: ${{ inputs.TAG }}
+      MADOR: ${{ inputs.MADOR }}
     secrets:
        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
