@@ -19,6 +19,9 @@ on:
       MADOR:
         required: true
         type: string
+      ENVIRONMENT:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -53,5 +56,6 @@ jobs:
     with:
       TAG: ${{ inputs.TAG }}
       MADOR: ${{ inputs.MADOR }}
+      ENVIRONMENT: ${{ inputs.ENVIRONMENT }}
     secrets:
        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
