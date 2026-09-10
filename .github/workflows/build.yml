@@ -69,28 +69,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - id: folders
-        shell: bash
-        run: |
-          folders=$(
-            {
-              # Non-monorepo: Dockerfile in repository root
-              if [ -f "./Dockerfile" ]; then
-                echo $(printf '%s\n' "${{ github.event.repository.name }}" |
-                  jq -R -s -c 'split("\n") | map(select(length > 0))')
-              fi
+- id: folders
+  shell: bash
+  run: |
+    if [ -f "./Dockerfile" ]; then
+      folders='[{"name":"${{ github.event.repository.name }}","path":"."}]'
+    else
+      folders=$(
+        find . -mindepth 2 -maxdepth 2 -type f -name Dockerfile \
+          -printf '%h\n' |
+        sed 's|^\./||' |
+        sort -u |
+        jq -R -s -c '
+          split("\n")
+          | map(select(length > 0))
+          | map({
+              name: .,
+              path: ("./" + .)
+            })
+        '
+      )
+    fi
 
-              # Monorepo: Dockerfile inside a top-level folder
-              find . -mindepth 2 -maxdepth 2 -type f -name Dockerfile \
-                -printf '%h\n' |
-                sed 's|^\./||'
-            } |
-            sort -u |
-            jq -R -s -c 'split("\n") | map(select(length > 0))'
-          )
-
-          echo "$folders"
-          echo "folders=$folders" >> "$GITHUB_OUTPUT"
+    echo "Build folders: $folders"
+    echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
   build:
     if: needs.changes.outputs.folders != '[]'
