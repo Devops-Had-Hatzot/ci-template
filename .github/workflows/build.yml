@@ -5,6 +5,10 @@ on:
     secrets:
       GCP_CREDENTIALS:
         required: true
+    inputs:
+      TAG:
+        required: true
+        type: string
 
 env:
   REGION: me-west1
@@ -55,14 +59,14 @@ jobs:
         uses: Devops-Had-Hatzot/ci-template/.github/actions/auth@main
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
-          registry: ${{ env.REGION }}-docker.pkg.dev
+          registry: ${{ env.REGION }}-docker.pkg.dev/${{ env.REPOSITORY }}
 
       - name: Build and push
         run: |
           IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
 
           docker build \
-            -t "$IMAGE:${{ env.TAG }}-pre" \
+            -t "$IMAGE:${{ inputs.TAG }}-pre" \
             "./${{ matrix.folder }}"
 
           docker push "$IMAGE:${{ env.TAG }}-pre"
@@ -90,7 +94,7 @@ jobs:
       - name: Find latest pre image
         shell: bash
         run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.REPOSITORY }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
 
           LATEST_PRE=$(
             gcloud artifacts docker tags list "$IMAGE" \

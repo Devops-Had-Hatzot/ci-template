@@ -9,11 +9,17 @@ on:
     tags:
       - '*'
   workflow_call:
+    inputs:
+      TAG:
+        required: true
+        type: string
 
 jobs:
   build:
     if: github.ref == 'refs/heads/main'
     uses: Devops-Had-Hatzot/ci-template/.github/workflows/build.yml@main
+    with:
+      TAG: ${{ inputs.TAG }}
     secrets:
        GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
