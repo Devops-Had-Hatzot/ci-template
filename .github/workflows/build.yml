@@ -123,7 +123,7 @@ jobs:
           docker push "$IMAGE:${{ inputs.TAG }}-pre"
 
   mirror:
-    if: needs.changes.outputs.folders != '[]'
+    if: needs.folders.outputs.folders != '[]'
     runs-on: self-hosted
     needs: folders
 
