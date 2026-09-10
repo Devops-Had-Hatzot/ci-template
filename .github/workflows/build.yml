@@ -115,7 +115,7 @@ jobs:
       - name: Find latest pre image
         shell: bash
         run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ secrets.REPOSITORY }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
+          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.REPOSITORY }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
 
           LATEST_PRE=$(
             gcloud artifacts docker tags list "$IMAGE" \
