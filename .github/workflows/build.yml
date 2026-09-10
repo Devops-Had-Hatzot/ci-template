@@ -69,7 +69,7 @@ jobs:
             -t "$IMAGE:${{ inputs.TAG }}-pre" \
             "./${{ matrix.folder }}"
 
-          docker push "$IMAGE:${{ env.TAG }}-pre"
+          docker push "$IMAGE:${{ inputs.TAG }}-pre"
 
   mirror:
     if: startsWith(github.ref, 'refs/tags/')
