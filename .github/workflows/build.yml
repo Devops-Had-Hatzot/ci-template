@@ -27,19 +27,36 @@ jobs:
           fetch-depth: 0
 
       - id: folders
+        shell: bash
         run: |
-          folders=$(git diff --name-only \
+          changed_files=$(git diff --name-only \
             "${{ github.event.before }}" \
-            "${{ github.sha }}" |
-            cut -d/ -f1 |
-            sort -u |
-            jq -R -s -c 'split("\n") | map(select(length > 0))')
+            "${{ github.sha }}")
 
-          echo $folders
-          echo $github.event.before
-          echo $github.sha
-          git diff --name-only
+          echo "Changed files:"
+          echo "$changed_files"
 
+          # Non-monorepo:
+          # If there is a Dockerfile in the root, build the root context.
+          if [ -f "./Dockerfile" ]; then
+            folders='["."]'
+          else
+            # Monorepo:
+            # Find top-level folders affected by the changes
+            folders=$(
+              echo "$changed_files" |
+              awk -F/ 'NF > 1 {print $1}' |
+              sort -u |
+              while read -r folder; do
+                if [ -f "$folder/Dockerfile" ]; then
+                  echo "$folder"
+                fi
+              done |
+              jq -R -s -c 'split("\n") | map(select(length > 0))'
+            )
+          fi
+
+          echo "Build folders: $folders"
           echo "folders=$folders" >> "$GITHUB_OUTPUT"
 
   folders:
@@ -54,12 +71,23 @@ jobs:
           fetch-depth: 0
 
       - id: folders
+        shell: bash
         run: |
-          folders=$(find . -mindepth 2 -maxdepth 2 -type f -name Dockerfile \
-            -printf '%h\n' |
-            sed 's|^\./||' |
+          folders=$(
+            {
+              # Non-monorepo: Dockerfile in repository root
+              if [ -f "./Dockerfile" ]; then
+                echo "."
+              fi
+
+              # Monorepo: Dockerfile inside a top-level folder
+              find . -mindepth 2 -maxdepth 2 -type f -name Dockerfile \
+                -printf '%h\n' |
+                sed 's|^\./||'
+            } |
             sort -u |
-            jq -R -s -c 'split("\n") | map(select(length > 0))')
+            jq -R -s -c 'split("\n") | map(select(length > 0))'
+          )
 
           echo "$folders"
           echo "folders=$folders" >> "$GITHUB_OUTPUT"
