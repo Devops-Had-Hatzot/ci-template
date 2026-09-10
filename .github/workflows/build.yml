@@ -76,7 +76,7 @@ jobs:
             {
               # Non-monorepo: Dockerfile in repository root
               if [ -f "./Dockerfile" ]; then
-                folders=$(printf '%s\n' "${{ github.event.repository.name }}" |
+                echo $(printf '%s\n' "${{ github.event.repository.name }}" |
                   jq -R -s -c 'split("\n") | map(select(length > 0))')
               fi
 
