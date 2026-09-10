@@ -16,7 +16,7 @@ env:
 
 jobs:
   changes:
-    if: github.event_name == 'push'
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: self-hosted
     outputs:
       folders: ${{ steps.folders.outputs.folders }}
@@ -140,22 +140,3 @@ jobs:
             "$IMAGE:${{ github.ref_name }}"
 
           docker push "$IMAGE:${{ github.ref_name }}"
-
-      - name: Mirror image
-        shell: bash
-        run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT }}/${{ env.REPOSITORY }}/${{ matrix.folder }}"
-
-          SOURCE_TAG="${{ steps.latest-pre.outputs.latest_pre }}"
-          TARGET_TAG="${{ github.ref_name }}"
-
-          echo "Source:      $IMAGE:$SOURCE_TAG"
-          echo "Destination: $IMAGE:$TARGET_TAG"
-
-          docker pull "$IMAGE:$SOURCE_TAG"
-
-          docker tag \
-            "$IMAGE:$SOURCE_TAG" \
-            "$IMAGE:$TARGET_TAG"
-
-          docker push "$IMAGE:$TARGET_TAG"
