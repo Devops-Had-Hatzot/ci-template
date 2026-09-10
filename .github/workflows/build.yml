@@ -78,7 +78,8 @@ jobs:
             {
               # Non-monorepo: Dockerfile in repository root
               if [ -f "./Dockerfile" ]; then
-                echo "."
+                folders=$(printf '%s\n' "${{ github.event.repository.name }}" |
+                  jq -R -s -c 'split("\n") | map(select(length > 0))')
               fi
 
               # Monorepo: Dockerfile inside a top-level folder
